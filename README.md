@@ -123,4 +123,4 @@ location ^~/upload/ {
     proxy_pass        http:127.0.0.1:5000/;
 }
 ```
-## 最後打開 http:localhost/upload
+## 最後打開 http://localhost/upload
