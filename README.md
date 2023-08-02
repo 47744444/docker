@@ -87,3 +87,24 @@ CMD ["gunicorn", "--bind", "0.0.0.0:5000", "main:app"]
         - data/
     - Dockerfile
 ```
+# 安裝Docker
+## Visit https://docs.docker.com/engine/install/ubuntu/
+# 發布image
+```
+#在dockerfile目錄下建置
+docker build -t <dockerhub/imagename:版本> .
+docker images
+```
+# 推送至dockerhub
+```
+docker push <dockerhub/imagename:版本>
+```
+# 創建volume
+```
+
+```
+# 執行container
+```
+docker run -d --name <dockerhub/imagename:版本> -p 5000:5000 <dockerhub/imagename:版本>
+docker ps
+```
