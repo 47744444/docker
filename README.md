@@ -75,8 +75,9 @@ CMD ["python", "./main.py"]
         - data/
     - Dockerfile
 ```
-# 安裝Docker
-## Visit https://docs.docker.com/engine/install/ubuntu/
+# 打包Docker
+## 安裝Docker
+### Visit https://docs.docker.com/engine/install/ubuntu/
 ## 發布image
 ```
 #在dockerfile目錄下建置
@@ -96,3 +97,30 @@ sudo docker volume create <VolName>
 docker run -d --name <dockerhub/imagename:版本> -v <VolName>:/code -p 5000:5000 <dockerhub/imagename:版本>
 docker ps
 ```
+# nginx設定
+## 執行nginx的Image
+```
+docker run -d --name nginx --net=host nginx:latest 
+```
+## 進入nginx容器
+```
+docker exec -it nginx /bin/bash
+```
+## 安裝必要套件
+```
+apt update
+apt install nano
+```
+## 進到default目錄下
+```
+cd /etc/nginx/conf.d 
+```
+## 修改default
+```
+nano default.conf
+#在service底下加入
+location ^~/upload/ {
+    proxy_pass        http:127.0.0.1:5000/;
+}
+```
+## 最後打開http:location/upload最後打開http:location/upload
