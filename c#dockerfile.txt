@@ -1,6 +1,0 @@
-FROM mcr.microsoft.com/dotnet/aspnet:6.0
-EXPOSE 13510
-ENV ASPNETCORE_URLS=http://+:13510
-WORKDIR /app
-ADD . /app
-ENTRYPOINT ["dotnet", "MassageWeb.dll"]
