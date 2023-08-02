@@ -33,7 +33,7 @@ if __name__ == '__main__':
     app.debug = True
     app.run()
 ```
-# index.html
+## index.html
 ```
 <!DOCTYPE html>
 <html>
@@ -49,7 +49,7 @@ if __name__ == '__main__':
 </body>
 </html>
 ```
-# DockerFile
+## DockerFile
 ```
 FROM python:3.9-slim
 
@@ -65,7 +65,7 @@ RUN pip install -r requirements.txt
 # Container 啟動指令：Container 啟動後通過 python 運行 main.py
 CMD ["python", "./main.py"]
 ```
-# 資料結構
+## 資料結構
 ```
 - your_project_folder/
     - main.py
@@ -77,21 +77,21 @@ CMD ["python", "./main.py"]
 ```
 # 安裝Docker
 ## Visit https://docs.docker.com/engine/install/ubuntu/
-# 發布image
+## 發布image
 ```
 #在dockerfile目錄下建置
 docker build -t <dockerhub/imagename:版本> .
 docker images
 ```
-# 推送至dockerhub
+## 推送至dockerhub
 ```
 docker push <dockerhub/imagename:版本>
 ```
-# 創建volume
+## 創建volume
 ```
 sudo docker volume create <VolName>
 ```
-# 執行container
+## 執行container
 ```
 docker run -d --name <dockerhub/imagename:版本> -v <VolName>:/code -p 5000:5000 <dockerhub/imagename:版本>
 docker ps
