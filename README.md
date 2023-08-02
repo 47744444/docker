@@ -1,66 +1,89 @@
-window端
-用vscode打開shorturltest專案
-開啟vs的terminal
-$ pip freeze > requirements.txt
-使用docker套件生成dockerfile
-port設定13501
-傳輸到ubuntu
-ubuntu端
-打開shorturl專案的terminal
-$ sudo docker build -t shorturltest .
-$ sudo docker run -d --name shorturltest -p 12501:13501 shorturltest
-$ sudo docker ps
-window端
-用vscode打開ChannelProgramtest專案
-使用docker套件生成dockerfile
-port設定13502
-dockerfile的位置要放在跟專案資料夾跟套件資料夾一樣的層
-傳輸到ubuntu
-ubuntu端
-打開專案ChannelProgramtest的terminal
-$ sudo docker build -t channelprogramtest .
-$ sudo docker run -d --name channelprogramtest -p 12502:13502 channelprogramtest
-停止並刪除上面兩個專案的container
-$ sudo docker stop shorturltest
-$ sudo docker rm shorturltest
-$ sudo docker stop channelprogramtest
-$ sudo docker rm channelprogramtest
-上傳兩個Image到dockerhub
-$ sudo docker login
-dockerhub網站，創建shorturltest、channelprogramtest
-$ sudo docker tag shorturltest zihrueiliou/shorturltest:v1.0.0
-$ sudo docker push zihrueiliou/shorturltest:v1.0.0
-$ sudo docker tag channelprogramtest zihrueiliou/channelprogramtest:v1.0.0
-$ sudo docker pushzihrueiliou/channelprogramtest:v1.0.0
-$ sudo docker images
-刪除上面兩個專案的image
-$ sudo docker rmi shorturltest
-$ sudo docker rmi zihrueiliou/shorturltest:v1.0.0
-$ sudo docker rmi channelprogramtest
-$ sudo docker rmi zihrueiliou/channelprogramtest:v1.0.0
-拉dockerhub的image
-$ sudo docker pull zihrueiliou/shorturltest:v1.0.0
-$ sudo docker pull zihrueiliou/channelprogramtest:v1.0.0
-$ sudo docker images
-同步到volume
-$ sudo docker run -it -d -p 12501:13501 -v shorturltest:/app --name shorturltest zihrueiliou/shorturltest:v1.0.0
-$ sudo docker run -it -d -p 12502:35898 -v channelprogramtest:/app --name channelprogramtest zihrueiliou/channelprogramtest:v1.0.0
-nginx
-$ sudo docker run -d --name nginxtest -v nginxtest:/etc/nginx --net=host nginx:latest
-進入nginx的volume
-編輯default.conf
-新增ssl資料夾
-在ssl資料夾新增2023資料夾
-在裡面放入ssl
-重啟nginx
-$ sudo docker stop nginxtest
-$ sudo docker start nginxtest
-關閉專案docker
-$ sudo docker stop shorturltest
-$ sudo docker rm shorturltest
-$ sudo docker stop channelprogramtest
-$ sudo docker rm channelprogramtest
-yml操作
-$ sudo docker-compose build
-$ sudo docker-compose push
-$ sudo docker-compose up -d
+# Python專案
+## main.py
+```
+from flask import Flask, render_template, request
+import os
+
+app = Flask(__name__)
+
+app.config['UPLOAD_FOLDER'] = 'static/data'
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        # 检查是否有文件被上传
+        if 'file' not in request.files:
+            return 'No file part'
+        
+        file = request.files['file']
+        
+        # 如果用户没有选择文件，浏览器也会发送一个空的part
+        if file.filename == '':
+            return 'No selected file'
+        
+        # 将上传的文件保存到指定目录中
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
+        
+        return 'File uploaded successfully!'
+    else:
+        return render_template('index.html')
+
+
+if __name__ == '__main__':
+    app.debug = True
+    app.run()
+```
+# index.html
+```
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Upload</title>
+</head>
+<body>
+    <h1>Upload a File</h1>
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="submit" value="Upload">
+    </form>
+</body>
+</html>
+```
+# DockerFile
+```
+# For more information, please refer to https://aka.ms/vscode-docker-python
+FROM python:3.10-slim
+
+EXPOSE 5000
+
+# Keeps Python from generating .pyc files in the container
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Turns off buffering for easier container logging
+ENV PYTHONUNBUFFERED=1
+
+# Install pip requirements
+COPY requirements.txt .
+RUN python -m pip install -r requirements.txt
+
+WORKDIR /app
+COPY . /app
+
+# Creates a non-root user with an explicit UID and adds permission to access the /app folder
+# For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
+RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
+USER appuser
+
+# During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "main:app"]
+```
+# 資料結構
+```
+- your_project_folder/
+    - main.py
+    - templates/
+        - index.html
+    - static/
+        - data/
+    - Dockerfile
+```
